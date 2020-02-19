@@ -87,52 +87,118 @@ Below is an explanation of keys being used
 **Please note**
 For 10.15 and on, a PCCC Configuration profile is needed.  [PCCC Payload to allow EnableFDE] (https://github.com/zacharysfisher/connect-login-notify/blob/master/images/PCCC_FDE.png)
 
-## Enable PAM
-JAMF has good instrutions on how to enable the PAM module.  [PAM Module Documentation](https://docs.jamf.com/jamf-connect/1.4.1/administrator-guide/Pluggable_Authentication_Module_(PAM).html)
+## RunScript Configuration
+JAMF has good instrutions on how to enable the RunScript mechanism for JAMF Login.  [RunScript Mechanism Documentation](https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Login_Script.html)
 
 You can also follow these instructions using the nano editor.
-1. Open terminal and edit the following file `sudo nano /etc/pam.d/sudo`
-2. Once the editor opens, add the following to the 2nd of line of the file.  Right below `# sudo: auth account password session`: `auth sufficient pam_saml.so`
-3. Press control + x to exit and then "y" and the enter key to save changes
+1. We have actually already enabled our workflow to enable this mechanism by using the `authchanger` command and to include `JamfConnectLogin:RunScript,privileged` in our postInstall script.
+2. In this script we will tell Notify what to display and what JAMF Policies to run.  See below for an example script:
+```#!/bin/bash
 
-Now you can use the `sudo` command and you should be prompted for Okta login.  The next step is to configure other authentication methods to use Okta as well.
+###
+###Notify Mechanism Enrollment Script
+###
 
-## Configure which Authentication Calls to use PAM for
-To configure the PAM module to use Okta Authentication for things like unlocking System Preferences and installing software, we must use the Security Tool that ships with macOS.  The file that controls the Auth Mechanism is `com.jamf.connect.sudosaml`.  You can read this file by typing the following into terminal:
-`security authorizationdb read com.jamf.connect.sudosaml`
+# Variables
+jamfbinary="/usr/local/bin/jamf"
 
-The results shoudl look like below:
+echo "Enrollment Beginning..." >> /tmp/output.txt
+
+# Set a main image
+# Image can be up to 660x105 it will scale up or down proportionally to fit
+
+echo "Command: Image: /usr/local/images/TTG.png" >> /var/tmp/depnotify.log
+
+# Set the Main Title at the top of the window
+
+echo "Command: MainTitle: Welcome to your new Mac!" >> /var/tmp/depnotify.log
+
+# Set the Body Text
+
+echo "Command: MainText: We are setting up a few things for you automatically.\\nJust grab a coffee! It won't take long!." >> /var/tmp/depnotify.log
+
+echo "Status: Preparing new machine" >> /var/tmp/depnotify.log 
+
+echo "Command: Determinate: 9" >> /var/tmp/depnotify.log
+sleep 3
+echo "Status: Checking some Magic for you..." >> /var/tmp/depnotify.log 
+
+#Checks for presence of JAMF Binary before continuing
+
+while [ ! -f /usr/local/bin/jamf ]
+do
+	sleep 2
+done
+
+### Jamf Policy Triggers
+
+sleep 3
+echo "Command: Image: /usr/local/images/chrome.png" >> /var/tmp/depnotify.log
+echo "Status: Installing Google Chrome" >> /var/tmp/depnotify.log 
+
+${jamfbinary} policy -event "google_chrome"
+
+sleep 3
+echo "Command: Image: /usr/local/images/slack.png" >> /var/tmp/depnotify.log
+echo "Status: Installing Slack" >> /var/tmp/depnotify.log 
+
+${jamfbinary} policy -event "slack"
+
+sleep 3
+echo "Command: Image: /usr/local/images/CCloud.png" >> /var/tmp/depnotify.log
+echo "Status: Installing Creative Cloud Launcher" >> /var/tmp/depnotify.log
+
+${jamfbinary} policy -event "creativecloud"
+
+sleep 3
+echo "Command: Image: /usr/local/images/VLC.png" >> /var/tmp/depnotify.log
+echo "Status: Installing VLC Media Player" >> /var/tmp/depnotify.log
+
+${jamfbinary} policy -event "vlcplayer"
+
+sleep 3
+echo "Command: Image: /usr/local/images/printers.png" >> /var/tmp/depnotify.log
+echo "Status: Installing Printer Software" >> /var/tmp/depnotify.log
+
+${jamfbinary} policy -event "printers"
+
+sleep 3
+echo "Command: Image: /usr/local/images/security.png" >> /var/tmp/depnotify.log
+echo "Status: Configuring Security Settings for your Computer" >> /var/tmp/depnotify.log
+
+${jamfbinary} policy -event "security"
+
+#sleep 3
+#echo "Command: Image: /usr/local/images/Filevault.png" >> /var/tmp/depnotify.log
+#echo "Status: Enabling FileVault Encryption" >> /var/tmp/depnotify.log
+#
+#${jamfbinary} policy -event "filevault"
+
+###
+### Welcome Screen
+###
+
+sleep 5
+echo "Command: Image: /usr/local/images/logo.png" >> /var/tmp/depnotify.log
+echo "Status: Almost done!" >> /var/tmp/depnotify.log 
+
+###
+### Clean Up
+###
+
+### Reset AuthChanger
+#/usr/local/bin/authchanger -reset -Okta —DefaultJCRight
+
+sleep 3
+echo "Command: Quit" >> /var/tmp/depnotify.log
+
+sleep 1
+rm -rf /var/tmp/depnotify.log
 
 ```
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>class</key>
-	<string>evaluate-mechanisms</string>
-	<key>comment</key>
-	<string>Rule to allow for Azure authentication</string>
-	<key>created</key>
-	<real>569394749.63492501</real>
-	<key>identifier</key>
-	<string>authchanger</string>
-	<key>mechanisms</key>
-	<array>
-		<string>JamfConnectLogin:AuthUINoCache</string>
-	</array>
-	<key>modified</key>
-	<real>582579735.53209305</real>
-	<key>requirement</key>
-	<string>identifier authchanger and anchor apple generic and certificate leaf[subject.CN] = "Mac Developer: Joel Rennich (92Q527YFQS)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
-	<key>shared</key>
-	<true/>
-	<key>tries</key>
-	<integer>10000</integer>
-	<key>version</key>
-	<integer>1</integer>
-</dict>
-</plist>
-```
+
+This script displays different images, display text and runs the on-boarding JAMF Policies.  A better explaination of commands that can be run can be found here on JAMF's documentation page. [Notify Screen Mechanism] (https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Notify_Screen.html)
+
 
 You will notice the `mechanisms` key.  Currently, it is set to `AuthUINoCache`.  If you would like Jamf Connect to not prompt the user for authentication for as long as the Okta Token length is set, change this to `AuthUI`.
 ###### Currently this feature does not work as intended, and JAMF has been notified.  No Estimate can be provided at this time for when it will be fixed. ######
