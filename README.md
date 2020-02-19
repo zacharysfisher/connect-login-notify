@@ -17,10 +17,8 @@ This page will explain how to configure Jamf Connect Login's Notify and Run Scri
 
 ## Prestage Package Configuration
 First we need to build our Pre-Stage package to look like the image below:
-![Prestage Package Configuration](https://github.com/zacharysfisher/connect-login-notify/blob/master/images/package_prestage.png).  As you can see, we are installing both Sync and Login to a temporary location which we will then all to install using the `installer` binary later in the process.  We are also installing out image files and the notify script location which will also be called later on in this provisioning process.
-2. Click Add Application and click Create New App.
-3. Post Install Script should look like below:
-
+![Prestage Package Configuration](https://github.com/zacharysfisher/connect-login-notify/blob/master/images/package_prestage.png).  As you can see, we are installing both Sync and Login to a temporary location which we will then all to install using the `installer` binary later in the process.  We are also installing out image files and the notify script location which will also be called later on in this provisioning process.Post Install Script should look like below:
+The package also needs a post-install script that will install Login, Sync and activate the Notify and RunScript Mechanisms for us.  Please see below.
 ```
 #!/bin/sh
 ## postinstall
@@ -30,17 +28,12 @@ installer -pkg /tmp/Jamf\ Connect\ Login-1.9.0.pkg -target /
 installer -pkg /tmp/Jamf\ Connect\ Sync-1.1.0.pkg -target /
 
 # Enable Notify - Run Script
-/usr/local/bin/authchanger -reset -Okta —DefaultJCRight -postAuth JamfConnectLogin:RunScript,privileged JamfConnectLogin:Notify
+/usr/local/bin/authchanger -reset -Okta —DefaultJCRight -preAuth JamfConnectLogin:RunScript,privileged JamfConnectLogin:Notify
 
 
 exit 0		## Success
 exit 1		## Failure
 ```
-
-4. On the next screen, Name your application and for login Redirect URI enter in: `https://127.0.0.1/jamfconnect` and then hit save.
-5. Your app is now created.  You can assign it to users.  However, before you do so we need to configure a few more thing.  Make your App look like the following:
-![OIDC App Settings](https://user-images.githubusercontent.com/17932646/61080455-18cd5100-a3f3-11e9-90fc-562d7093d1a7.png)
-6. Lastly, scroll down and save the value of ClientID for use later.
 
 ## Set Keys for the PAM Module
 Keys for the PAM Module get written to same plist as other Jamf Connect Login Keys: `/Library/Preferences/com.jamf.connect.login.plist`
