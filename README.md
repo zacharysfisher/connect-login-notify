@@ -1,15 +1,15 @@
 # jamf_connect_notify
 
 ## Overview
-This page will explain how to configure Jamf Connect Login's Notify and Run Script mechanisms (Pluggable Authentication Module) to be used for user provisioning.
+This page will explain how to configure Jamf Connect Login's Notify and Run Script mechanisms (Pluggable Authentication Module) to be used for user provisioning.  This page is geared towards Okta users ONLY.
 
 
 ## Contents
 * Prestage Package Configuration
-* Prestage Settings
-* RunScript Configuration
-* Okta Configurations for Standard / Admin Users
 * Plist Configuration for Jamf Connect Login
+* RunScript Configuration
+* Prestage Settings
+* Okta Configurations for Standard / Admin Users
 * Deployment
 
 
@@ -35,15 +35,57 @@ exit 0		## Success
 exit 1		## Failure
 ```
 
-## Set Keys for the PAM Module
-Keys for the PAM Module get written to same plist as other Jamf Connect Login Keys: `/Library/Preferences/com.jamf.connect.login.plist`
+Once this package is ready for building, make sure that you sign the package and upload it to your distribution points for deployment.
+
+## Plist Configuration for Jamf Connect Login
+Below is an example Plist that we can use with a Custom Settings payload Configuration Profile:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AuthServer</key>
+	<string>acme.okta.com</string>
+	<key>HelpURL</key>
+	<string>https://acme.okta.com</string>
+	<key>LocalFallback</key>
+	<true/>
+	<key>LoginLogo</key>
+	<string>/usr/local/images/company_logo.png</string>
+	<key>OIDCIgnoreCookies</key>
+	<true/>
+	<key>OIDCRedirectURI</key>
+	<string>https://127.0.0.1/jamfconnect</string>
+	<key>AllowNetworkSelection</key>
+	<true/>
+	<key>CreateSyncPasswords</key>
+	<true/>
+	<key>ScriptPath</key>
+	<string>/usr/local/bin/enrollment_script.sh</string>
+	<key>EnableFDE</key>
+	<true/>
+</dict>
+</plist>
+```
+
+Below is an explanation of keys being used
 
 | Key                    | Description                                                            | Example         |
 |------------------------|------------------------------------------------------------------------|-----------------|
-| AuthUIOIDCRedirectURI  | The Redirect URI the user is sent to after successful authentication.  | `<key>AuthUIOIDCRedirectURI</key>` `<string>https://127.0.0.1/jamfconnect</string>` |
-| AuthUIOIDCProvider     | Specifies the IdP provider integrated with Jamf Connect Login          | `<key>AuthUIOIDCProvider</key>` `<string>Okta</string>` |
-| AuthUIOIDCTenant       | Specifices the Tenant or Org of your IDP Instance                    | `<key>AuthUIOIDCTenant</key>` `<string>Acme</string>` |
-| AuthUIOIDCClientID     | The Client ID of the added app in your IdP used to authenticate the user | `<key>AuthUIOIDCClientID</key>` `<string>0oad0gmia54gn3y8923h1</string>` |
+| AuthServer  | Your Okta base URL for your organization | `<key>AuthServer</key>` `<string>acme.okta.com</string>` |
+| HelpURL     | URL users are directed to when hitting help at login.  This can be a custom page or your okta homepage    | `<key>HelpURL</key>` `<string>https://acme.okta.com</string>` |
+| LocalFallback       | Allows local authentication in case Okta is not reachable    | `<key>LocalFallback</key>` `<true/>` |
+| LoginLogo     | Login Logo to be displayed at Jamf Connect Login screen | `<key>LoginLogo</key>` `<string>/path/to/image.png</string>` |
+| OIDCIgnoreCookies     | Ignores any cookies stored by the loginwindow | `<key>OIDCIgnoreCookies</key>` `<true/>` |
+| OIDCRedirectURI     | The redirect URI used by your Jamf Connect app in Okta.  "jamfconnect://127.0.0.1/jamfconnect" is recommended by default. | `<key>OIDCRedirectURI</key>` `<string>https://127.0.0.1/jamfconnect</string>` |
+| AllowNetworkSelection     | Allows user to select Wi-Fi network at login window. | `<key>AllowNetworkSelection</key>` `<true/>` |
+| CreateSyncPasswords     | Creates a keychain entry for Jamf Connect Sync (requires Sync to be installed already at time of login for this to function | `<key>CreateSyncPasswords</key>` `<true/>` |
+| ScriptPath     | Specifies the path to the script or other executable run by the RunScript mechanism. | `<key>ScriptPath</key>` `<string>/path/to/script.sh</string>` |
+| EnableFDE     | Enables Filevault and stores the FV Recovery key locally for Escrow to JAMF Pro (Requires Escrow Configuration Profile to send to JAMF Pro). | `<key>CEnableFDE</key>` `<true/>` |
+
+**Please note**
+For 10.15 and on, a PCCC Configuration profile is needed.  
 
 These keys can either be set using a Configuration Profile with JAMF Pro or by using the defaults command.
 
