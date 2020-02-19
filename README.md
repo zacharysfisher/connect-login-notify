@@ -85,11 +85,7 @@ Below is an explanation of keys being used
 | EnableFDE     | Enables Filevault and stores the FV Recovery key locally for Escrow to JAMF Pro (Requires Escrow Configuration Profile to send to JAMF Pro). | `<key>CEnableFDE</key>` `<true/>` |
 
 **Please note**
-For 10.15 and on, a PCCC Configuration profile is needed.  
-
-These keys can either be set using a Configuration Profile with JAMF Pro or by using the defaults command.
-
-Example Defaults command: `sudo defaults write /Library/Preferences/com.jamf.connect.login.plist AuthUIOIDCProvider -string Okta`
+For 10.15 and on, a PCCC Configuration profile is needed.  [PCCC Payload to allow EnableFDE] (https://github.com/zacharysfisher/connect-login-notify/blob/master/images/PCCC_FDE.png)
 
 ## Enable PAM
 JAMF has good instrutions on how to enable the PAM module.  [PAM Module Documentation](https://docs.jamf.com/jamf-connect/1.4.1/administrator-guide/Pluggable_Authentication_Module_(PAM).html)
