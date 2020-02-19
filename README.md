@@ -93,7 +93,9 @@ JAMF has good instrutions on how to enable the RunScript mechanism for JAMF Logi
 You can also follow these instructions using the nano editor.
 1. We have actually already enabled our workflow to enable this mechanism by using the `authchanger` command and to include `JamfConnectLogin:RunScript,privileged` in our postInstall script.
 2. In this script we will tell Notify what to display and what JAMF Policies to run.  See below for an example script:
-```#!/bin/bash
+
+```
+#!/bin/bash
 
 ###
 ###Notify Mechanism Enrollment Script
@@ -200,32 +202,12 @@ rm -rf /var/tmp/depnotify.log
 This script displays different images, display text and runs the on-boarding JAMF Policies.  A better explaination of commands that can be run can be found here on JAMF's documentation page. [Notify Screen Mechanism] (https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Notify_Screen.html)
 
 
-You will notice the `mechanisms` key.  Currently, it is set to `AuthUINoCache`.  If you would like Jamf Connect to not prompt the user for authentication for as long as the Okta Token length is set, change this to `AuthUI`.
-###### Currently this feature does not work as intended, and JAMF has been notified.  No Estimate can be provided at this time for when it will be fixed. ######
+## Prestage Settings
+When creating a Prestage Enrollment to work with there are a few settings and configuration profiles that need to be enabled so that Jamf Connect Login gets configured properly.
 
-To be able to use the PAM Module for Authentication we need to do the following steps:
-1. Make a backup of the sudosaml file to use to overwrite the local authentication calls
-2. Determine with authorizationdb calls you want to use Jamf Connect for
-3. Backup the authorizationdb file you are about to overwrite with Jamf Connect
-4. Replace local authentication rule with the jamf connect rule
+1. Configuration Profiles (PPPC for Filevault and Jamf Connect Login Settings) should be scoped to these new computers in the `Configuration Profiles` section of JAMF Pro as well as scoped to the Prestage Enrollment.
 
-
-### Make a backup of the sudosaml file to use to overwrite the local authentication calls###
-To make a backup of the sudosaml file we need to use the security tool.  First you should go to a directory that you want to work out of.  Once there, you can run this command to make a backup:
-`security authorizationdb read com.jamf.connect.sudosaml > sudosaml.org`
-
-You now have a backup of the Jamf Connect mechanism for authentication.
-
-### Determine which authorizationdb calls you want use Jamf Connect for ###
-In macOS, there are many different authorization calls that are made when certain tasks are completed.  For this example, we will edit the authorization used to see if a user can install a pkg.  This authorization is `system.install.software`.  YOu can view the current rule for this call by using this command: `security authorizationdb read system.install.software`.  This default rule checks if the user is in the admin group to allow the installation of the package.  You can find a table of some calls to configure below.
-
-### Backup the authorizationdb file you are about to overwrite with Jamf Connect ###
-Now that we have determined what the authorization rule that we want to edit is we can replace the default macOS rule with the Jamf Connect one.  Before we do this, we should back up the macOS default rule in case things go wrong.  We can backup this file by typing this command: `security authorizationdb read system.install.software > installsoftware.org`.  
-
-### Replace local authentication rule with Jamf Connect rule ###
-Now we can add our Jamf Connect rule.  We do this by using the following command: `security authorizationdb write system.install.software < sudosaml.org`.  This will overwrite the rule with the backup of the jamf connect mechanism we made of backup of earlier.  you can verify this worked by typing `security authorizationdb read system.install.software` and you should see the Jamf Connect mechanism.
-
-Now you can test this by trying to install a package.  If everything was configured properly, you should be prompted for an Okta login when you install Packages or use the `sudo` command in terminal.
+2. 
 
 
 ## Authorization Rules ##
