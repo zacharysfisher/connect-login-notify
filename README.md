@@ -97,7 +97,7 @@ Below is an explanation of keys being used
 For 10.15 and on, a PCCC Configuration profile is needed.  [PCCC Payload to allow EnableFDE](https://github.com/zacharysfisher/connect-login-notify/blob/master/images/PCCC_FDE.png)
 
 ## RunScript Configuration
-JAMF has good instrutions on how to enable the RunScript mechanism for JAMF Login.  ![RunScript Mechanism Documentation](https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Login_Script.html)
+JAMF has good instrutions on how to enable the RunScript mechanism for JAMF Login.  [RunScript Mechanism Documentation](https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Login_Script.html)
 
 You can also follow these instructions using the nano editor.
 1. We have actually already enabled our workflow to enable this mechanism by using the `authchanger` command and to include `JamfConnectLogin:RunScript,privileged` in our postInstall script.
