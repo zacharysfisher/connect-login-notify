@@ -85,10 +85,10 @@ Below is an explanation of keys being used
 | EnableFDE     | Enables Filevault and stores the FV Recovery key locally for Escrow to JAMF Pro (Requires Escrow Configuration Profile to send to JAMF Pro). | `<key>CEnableFDE</key>` `<true/>` |
 
 **Please note**
-For 10.15 and on, a PCCC Configuration profile is needed.  [PCCC Payload to allow EnableFDE] (https://github.com/zacharysfisher/connect-login-notify/blob/master/images/PCCC_FDE.png)
+For 10.15 and on, a PCCC Configuration profile is needed.  [PCCC Payload to allow EnableFDE](https://github.com/zacharysfisher/connect-login-notify/blob/master/images/PCCC_FDE.png)
 
 ## RunScript Configuration
-JAMF has good instrutions on how to enable the RunScript mechanism for JAMF Login.  [RunScript Mechanism Documentation](https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Login_Script.html)
+JAMF has good instrutions on how to enable the RunScript mechanism for JAMF Login.  ![RunScript Mechanism Documentation](https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Login_Script.html)
 
 You can also follow these instructions using the nano editor.
 1. We have actually already enabled our workflow to enable this mechanism by using the `authchanger` command and to include `JamfConnectLogin:RunScript,privileged` in our postInstall script.
@@ -199,15 +199,21 @@ rm -rf /var/tmp/depnotify.log
 
 ```
 
-This script displays different images, display text and runs the on-boarding JAMF Policies.  A better explaination of commands that can be run can be found here on JAMF's documentation page. [Notify Screen Mechanism] (https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Notify_Screen.html)
+This script displays different images, display text and runs the on-boarding JAMF Policies.  A better explaination of commands that can be run can be found here on JAMF's documentation page. ![Notify Screen Mechanism](https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Notify_Screen.html)
 
 
 ## Prestage Settings
 When creating a Prestage Enrollment to work with there are a few settings and configuration profiles that need to be enabled so that Jamf Connect Login gets configured properly.
 
-1. Configuration Profiles (PPPC for Filevault and Jamf Connect Login Settings) should be scoped to these new computers in the `Configuration Profiles` section of JAMF Pro as well as scoped to the Prestage Enrollment.
+1. Configuration Profiles (PPPC for Filevault and Jamf Connect Login Settings) should be scoped to these new computers in the `Configuration Profiles` section of JAMF Pro as well as scoped to the Prestage Enrollment. [Configuration Profiles in Prestage Enrollment] (https://github.com/zacharysfisher/connect-login-notify/blob/master/images/Config_Prestage_profiles.png)
+2. Attach your Prestage package to the prestage enrollment.
+3. Make sure that no account settings are enabled so that no accounts are created once computer gets enrolled.
+4. The last step is to setup the General Settings tab with information specific to your deployment and select which Setup Assistant options you want to display to the user.
 
-2. 
+Once done, scope this enrollment to your devices.
+
+## Okta Configuration
+If you are using the Plist linked above, no 
 
 
 ## Authorization Rules ##
