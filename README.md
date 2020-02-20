@@ -226,7 +226,7 @@ If you are using the Plist linked above, no additionaly configuration is needed 
 
 | Key                    | Description                                                            | Example         |
 |------------------------|------------------------------------------------------------------------|-----------------|
-| OOIDCAdminClientID  | OIDC ClientID for Okta Application that makes the user an admin user upon logging in. | `<key>OIDCAdminClientID</key>` `<string>0oa3qmcgyywWj1JR52p7</string>` |
+| OIDCAdminClientID  | OIDC ClientID for Okta Application that makes the user an admin user upon logging in. | `<key>OIDCAdminClientID</key>` `<string>0oa3qmcgyywWj1JR52p7</string>` |
 | OIDCAccessClientID  | OIDC ClientID for Okta Application that makes the user a standard user upon logging in.    | `<key>OIDCAccessClientID</key>` `<string>0oa3qmdmdqJGOB1iG2p7</string>` |
 
 ## Authorization Rules ##
