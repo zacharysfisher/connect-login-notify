@@ -17,7 +17,7 @@ This page will explain how to configure Jamf Connect Login's Notify and Run Scri
 
 ## Prestage Package Configuration
 First we need to build our Pre-Stage package to look like the image below:
-<a href="Prestage Package Configuration"><img src="https://github.com/zacharysfisher/connect-login-notify/blob/master/images/package_prestage.png" height="100" width="100" ></a>
+<a href="Prestage Package Configuration"><img src="https://github.com/zacharysfisher/connect-login-notify/blob/master/images/package_prestage.png" height="250" width="500" ></a>
  As you can see, we are installing both Sync and Login to a temporary location which we will then all to install using the `installer` binary later in the process.  We are also installing out image files and the notify script location which will also be called later on in this provisioning process.Post Install Script should look like below:
 The package also needs a post-install script that will install Login, Sync and activate the Notify and RunScript Mechanisms for us.  Please see below.
 ```

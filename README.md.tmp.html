@@ -1,126 +1,243 @@
-<h1>jamf<em>connect</em>pam</h1>
+<h1>jamf<em>connect</em>notify</h1>
 
 <h2>Overview</h2>
 
-<p>This page will explain how to configure Jamf Connect Login's Notify and Run Script mechanisms (Pluggable Authentication Module) to be used for user provisioning.</p>
+<p>This page will explain how to configure Jamf Connect Login's Notify and Run Script mechanisms (Pluggable Authentication Module) to be used for user provisioning.  This page is geared towards Okta users ONLY.</p>
 
 <h2>Contents</h2>
 
-<p>*</p>
+<ul>
+<li>Prestage Package Configuration</li>
+<li>Plist Configuration for Jamf Connect Login</li>
+<li>RunScript Configuration</li>
+<li>Prestage Settings</li>
+<li>Okta Configurations for Standard / Admin Users</li>
+<li>Deployment</li>
+</ul>
 
-<p>To use the PAM Module with Okta a few steps need to be taken.
-* Create an Okta Application to handle Authentication 
-* Set Keys for the PAM Module
-* Enable PAM module for sudo commands
-* Configure which Authentication Calls to use PAM for
-* Deploy Script, Configuration Profile (This includes setting up some JAMF Policies)</p>
+<h2>Prestage Package Configuration</h2>
 
-<h2>Create an Okta Application to handle Authentication</h2>
+<p>First we need to build our Pre-Stage package to look like the image below:
+<a href="Prestage Package Configuration"><img src="https://github.com/zacharysfisher/connect-login-notify/blob/master/images/package_prestage.png" height="250" width="500" ></a>
+ As you can see, we are installing both Sync and Login to a temporary location which we will then all to install using the <code>installer</code> binary later in the process.  We are also installing out image files and the notify script location which will also be called later on in this provisioning process.Post Install Script should look like below:
+The package also needs a post-install script that will install Login, Sync and activate the Notify and RunScript Mechanisms for us.  Please see below.
+```</p>
 
-<ol>
-<li>Go to the Okta Admin console and go to the Applications page.  (ie. organization.okta.com/admin/apps/active)</li>
-<li>Click Add Application and click Create New App.</li>
-<li>On the following Screen, select Native App as platform and OpenID Connect as Sign In Method.  Hit Create to advance to next screen.</li>
-<li>On the next screen, Name your application and for login Redirect URI enter in: <code>https://127.0.0.1/jamfconnect</code> and then hit save.</li>
-<li>Your app is now created.  You can assign it to users.  However, before you do so we need to configure a few more thing.  Make your App look like the following:
-<img src="https://user-images.githubusercontent.com/17932646/61080455-18cd5100-a3f3-11e9-90fc-562d7093d1a7.png" alt="OIDC App Settings" title="" /></li>
-<li>Lastly, scroll down and save the value of ClientID for use later.</li>
-</ol>
+<h1>!/bin/sh</h1>
 
-<h2>Set Keys for the PAM Module</h2>
+<h2>postinstall</h2>
 
-<p>Keys for the PAM Module get written to same plist as other Jamf Connect Login Keys: <code>/Library/Preferences/com.jamf.connect.login.plist</code></p>
+<h1>Install JCL + Sync</h1>
 
-<p>| Key                    | Description                                                            | Example         |
-|------------------------|------------------------------------------------------------------------|-----------------|
-| AuthUIOIDCRedirectURI  | The Redirect URI the user is sent to after successful authentication.  | <code>&lt;key&gt;AuthUIOIDCRedirectURI&lt;/key&gt;</code> <code>&lt;string&gt;https://127.0.0.1/jamfconnect&lt;/string&gt;</code> |
-| AuthUIOIDCProvider     | Specifies the IdP provider integrated with Jamf Connect Login          | <code>&lt;key&gt;AuthUIOIDCProvider&lt;/key&gt;</code> <code>&lt;string&gt;Okta&lt;/string&gt;</code> |
-| AuthUIOIDCTenant       | Specifices the Tenant or Org of your IDP Instance                    | <code>&lt;key&gt;AuthUIOIDCTenant&lt;/key&gt;</code> <code>&lt;string&gt;Acme&lt;/string&gt;</code> |
-| AuthUIOIDCClientID     | The Client ID of the added app in your IdP used to authenticate the user | <code>&lt;key&gt;AuthUIOIDCClientID&lt;/key&gt;</code> <code>&lt;string&gt;0oad0gmia54gn3y8923h1&lt;/string&gt;</code> |</p>
+<p>installer -pkg /tmp/Jamf\ Connect\ Login-1.9.0.pkg -target / 
+installer -pkg /tmp/Jamf\ Connect\ Sync-1.1.0.pkg -target /</p>
 
-<p>These keys can either be set using a Configuration Profile with JAMF Pro or by using the defaults command.</p>
+<h1>Enable Notify - Run Script</h1>
 
-<p>Example Defaults command: <code>sudo defaults write /Library/Preferences/com.jamf.connect.login.plist AuthUIOIDCProvider -string Okta</code></p>
+<p>/usr/local/bin/authchanger -reset -Okta —DefaultJCRight -preAuth JamfConnectLogin:RunScript,privileged JamfConnectLogin:Notify</p>
 
-<h2>Enable PAM</h2>
+<p>exit 0      ## Success
+exit 1      ## Failure
+```</p>
 
-<p>JAMF has good instrutions on how to enable the PAM module.  <a href="https://docs.jamf.com/jamf-connect/1.4.1/administrator-guide/Pluggable_Authentication_Module_(PAM">PAM Module Documentation</a>.html)</p>
+<p>Once this package is ready for building, make sure that you sign the package and upload it to your distribution points for deployment.</p>
 
-<p>You can also follow these instructions using the nano editor.
-1. Open terminal and edit the following file <code>sudo nano /etc/pam.d/sudo</code>
-2. Once the editor opens, add the following to the 2nd of line of the file.  Right below <code># sudo: auth account password session</code>: <code>auth sufficient pam_saml.so</code>
-3. Press control + x to exit and then "y" and the enter key to save changes</p>
+<h2>Plist Configuration for Jamf Connect Login</h2>
 
-<p>Now you can use the <code>sudo</code> command and you should be prompted for Okta login.  The next step is to configure other authentication methods to use Okta as well.</p>
-
-<h2>Configure which Authentication Calls to use PAM for</h2>
-
-<p>To configure the PAM module to use Okta Authentication for things like unlocking System Preferences and installing software, we must use the Security Tool that ships with macOS.  The file that controls the Auth Mechanism is <code>com.jamf.connect.sudosaml</code>.  You can read this file by typing the following into terminal:
-<code>security authorizationdb read com.jamf.connect.sudosaml</code></p>
-
-<p>The results shoudl look like below:</p>
+<p>Below is an example Plist that we can use with a Custom Settings payload Configuration Profile:</p>
 
 <p><code>
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;
 &lt;plist version="1.0"&gt;
 &lt;dict&gt;
-    &lt;key&gt;class&lt;/key&gt;
-    &lt;string&gt;evaluate-mechanisms&lt;/string&gt;
-    &lt;key&gt;comment&lt;/key&gt;
-    &lt;string&gt;Rule to allow for Azure authentication&lt;/string&gt;
-    &lt;key&gt;created&lt;/key&gt;
-    &lt;real&gt;569394749.63492501&lt;/real&gt;
-    &lt;key&gt;identifier&lt;/key&gt;
-    &lt;string&gt;authchanger&lt;/string&gt;
-    &lt;key&gt;mechanisms&lt;/key&gt;
-    &lt;array&gt;
-        &lt;string&gt;JamfConnectLogin:AuthUINoCache&lt;/string&gt;
-    &lt;/array&gt;
-    &lt;key&gt;modified&lt;/key&gt;
-    &lt;real&gt;582579735.53209305&lt;/real&gt;
-    &lt;key&gt;requirement&lt;/key&gt;
-    &lt;string&gt;identifier authchanger and anchor apple generic and certificate leaf[subject.CN] = "Mac Developer: Joel Rennich (92Q527YFQS)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */&lt;/string&gt;
-    &lt;key&gt;shared&lt;/key&gt;
+    &lt;key&gt;AuthServer&lt;/key&gt;
+    &lt;string&gt;acme.okta.com&lt;/string&gt;
+    &lt;key&gt;HelpURL&lt;/key&gt;
+    &lt;string&gt;https://acme.okta.com&lt;/string&gt;
+    &lt;key&gt;LocalFallback&lt;/key&gt;
     &lt;true/&gt;
-    &lt;key&gt;tries&lt;/key&gt;
-    &lt;integer&gt;10000&lt;/integer&gt;
-    &lt;key&gt;version&lt;/key&gt;
-    &lt;integer&gt;1&lt;/integer&gt;
+    &lt;key&gt;LoginLogo&lt;/key&gt;
+    &lt;string&gt;/usr/local/images/company_logo.png&lt;/string&gt;
+    &lt;key&gt;OIDCIgnoreCookies&lt;/key&gt;
+    &lt;true/&gt;
+    &lt;key&gt;OIDCRedirectURI&lt;/key&gt;
+    &lt;string&gt;https://127.0.0.1/jamfconnect&lt;/string&gt;
+    &lt;key&gt;AllowNetworkSelection&lt;/key&gt;
+    &lt;true/&gt;
+    &lt;key&gt;CreateSyncPasswords&lt;/key&gt;
+    &lt;true/&gt;
+    &lt;key&gt;ScriptPath&lt;/key&gt;
+    &lt;string&gt;/usr/local/bin/enrollment_script.sh&lt;/string&gt;
+    &lt;key&gt;EnableFDE&lt;/key&gt;
+    &lt;true/&gt;
 &lt;/dict&gt;
 &lt;/plist&gt;
 </code></p>
 
-<p>You will notice the <code>mechanisms</code> key.  Currently, it is set to <code>AuthUINoCache</code>.  If you would like Jamf Connect to not prompt the user for authentication for as long as the Okta Token length is set, change this to <code>AuthUI</code>.</p>
+<p>Below is an explanation of keys being used</p>
 
-<h6>Currently this feature does not work as intended, and JAMF has been notified.  No Estimate can be provided at this time for when it will be fixed.</h6>
+<p>| Key                    | Description                                                            | Example         |
+|------------------------|------------------------------------------------------------------------|-----------------|
+| AuthServer  | Your Okta base URL for your organization | <code>&lt;key&gt;AuthServer&lt;/key&gt;</code> <code>&lt;string&gt;acme.okta.com&lt;/string&gt;</code> |
+| HelpURL     | URL users are directed to when hitting help at login.  This can be a custom page or your okta homepage    | <code>&lt;key&gt;HelpURL&lt;/key&gt;</code> <code>&lt;string&gt;https://acme.okta.com&lt;/string&gt;</code> |
+| LocalFallback       | Allows local authentication in case Okta is not reachable    | <code>&lt;key&gt;LocalFallback&lt;/key&gt;</code> <code>&lt;true/&gt;</code> |
+| LoginLogo     | Login Logo to be displayed at Jamf Connect Login screen | <code>&lt;key&gt;LoginLogo&lt;/key&gt;</code> <code>&lt;string&gt;/path/to/image.png&lt;/string&gt;</code> |
+| OIDCIgnoreCookies     | Ignores any cookies stored by the loginwindow | <code>&lt;key&gt;OIDCIgnoreCookies&lt;/key&gt;</code> <code>&lt;true/&gt;</code> |
+| OIDCRedirectURI     | The redirect URI used by your Jamf Connect app in Okta.  "jamfconnect://127.0.0.1/jamfconnect" is recommended by default. | <code>&lt;key&gt;OIDCRedirectURI&lt;/key&gt;</code> <code>&lt;string&gt;https://127.0.0.1/jamfconnect&lt;/string&gt;</code> |
+| AllowNetworkSelection     | Allows user to select Wi-Fi network at login window. | <code>&lt;key&gt;AllowNetworkSelection&lt;/key&gt;</code> <code>&lt;true/&gt;</code> |
+| CreateSyncPasswords     | Creates a keychain entry for Jamf Connect Sync (requires Sync to be installed already at time of login for this to function | <code>&lt;key&gt;CreateSyncPasswords&lt;/key&gt;</code> <code>&lt;true/&gt;</code> |
+| ScriptPath     | Specifies the path to the script or other executable run by the RunScript mechanism. | <code>&lt;key&gt;ScriptPath&lt;/key&gt;</code> <code>&lt;string&gt;/path/to/script.sh&lt;/string&gt;</code> |
+| EnableFDE     | Enables Filevault and stores the FV Recovery key locally for Escrow to JAMF Pro (Requires Escrow Configuration Profile to send to JAMF Pro). | <code>&lt;key&gt;CEnableFDE&lt;/key&gt;</code> <code>&lt;true/&gt;</code> |</p>
 
-<p>To be able to use the PAM Module for Authentication we need to do the following steps:
-1. Make a backup of the sudosaml file to use to overwrite the local authentication calls
-2. Determine with authorizationdb calls you want to use Jamf Connect for
-3. Backup the authorizationdb file you are about to overwrite with Jamf Connect
-4. Replace local authentication rule with the jamf connect rule</p>
+<p><strong>Please note</strong>
+For 10.15 and on, a PCCC Configuration profile is needed.  <a href="https://github.com/zacharysfisher/connect-login-notify/blob/master/images/PCCC_FDE.png">PCCC Payload to allow EnableFDE</a></p>
 
-<h3>Make a backup of the sudosaml file to use to overwrite the local authentication calls</h3>
+<h2>RunScript Configuration</h2>
 
-<p>To make a backup of the sudosaml file we need to use the security tool.  First you should go to a directory that you want to work out of.  Once there, you can run this command to make a backup:
-<code>security authorizationdb read com.jamf.connect.sudosaml &gt; sudosaml.org</code></p>
+<p>JAMF has good instrutions on how to enable the RunScript mechanism for JAMF Login.  <img src="https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Login_Script.html" alt="RunScript Mechanism Documentation" title="" /></p>
 
-<p>You now have a backup of the Jamf Connect mechanism for authentication.</p>
+<p>You can also follow these instructions using the nano editor.
+1. We have actually already enabled our workflow to enable this mechanism by using the <code>authchanger</code> command and to include <code>JamfConnectLogin:RunScript,privileged</code> in our postInstall script.
+2. In this script we will tell Notify what to display and what JAMF Policies to run.  See below for an example script:</p>
 
-<h3>Determine which authorizationdb calls you want use Jamf Connect for</h3>
+<p>```</p>
 
-<p>In macOS, there are many different authorization calls that are made when certain tasks are completed.  For this example, we will edit the authorization used to see if a user can install a pkg.  This authorization is <code>system.install.software</code>.  YOu can view the current rule for this call by using this command: <code>security authorizationdb read system.install.software</code>.  This default rule checks if the user is in the admin group to allow the installation of the package.  You can find a table of some calls to configure below.</p>
+<h1>!/bin/bash</h1>
 
-<h3>Backup the authorizationdb file you are about to overwrite with Jamf Connect</h3>
+<h2>#</h2>
 
-<p>Now that we have determined what the authorization rule that we want to edit is we can replace the default macOS rule with the Jamf Connect one.  Before we do this, we should back up the macOS default rule in case things go wrong.  We can backup this file by typing this command: <code>security authorizationdb read system.install.software &gt; installsoftware.org</code>.  </p>
+<h3>Notify Mechanism Enrollment Script</h3>
 
-<h3>Replace local authentication rule with Jamf Connect rule</h3>
+<h2>#</h2>
 
-<p>Now we can add our Jamf Connect rule.  We do this by using the following command: <code>security authorizationdb write system.install.software &lt; sudosaml.org</code>.  This will overwrite the rule with the backup of the jamf connect mechanism we made of backup of earlier.  you can verify this worked by typing <code>security authorizationdb read system.install.software</code> and you should see the Jamf Connect mechanism.</p>
+<h1>Variables</h1>
 
-<p>Now you can test this by trying to install a package.  If everything was configured properly, you should be prompted for an Okta login when you install Packages or use the <code>sudo</code> command in terminal.</p>
+<p>jamfbinary="/usr/local/bin/jamf"</p>
+
+<p>echo "Enrollment Beginning..." >> /tmp/output.txt</p>
+
+<h1>Set a main image</h1>
+
+<h1>Image can be up to 660x105 it will scale up or down proportionally to fit</h1>
+
+<p>echo "Command: Image: /usr/local/images/TTG.png" >> /var/tmp/depnotify.log</p>
+
+<h1>Set the Main Title at the top of the window</h1>
+
+<p>echo "Command: MainTitle: Welcome to your new Mac!" >> /var/tmp/depnotify.log</p>
+
+<h1>Set the Body Text</h1>
+
+<p>echo "Command: MainText: We are setting up a few things for you automatically.\nJust grab a coffee! It won't take long!." >> /var/tmp/depnotify.log</p>
+
+<p>echo "Status: Preparing new machine" >> /var/tmp/depnotify.log </p>
+
+<p>echo "Command: Determinate: 9" >> /var/tmp/depnotify.log
+sleep 3
+echo "Status: Checking some Magic for you..." >> /var/tmp/depnotify.log </p>
+
+<h1>Checks for presence of JAMF Binary before continuing</h1>
+
+<p>while [ ! -f /usr/local/bin/jamf ]
+do
+    sleep 2
+done</p>
+
+<h3>Jamf Policy Triggers</h3>
+
+<p>sleep 3
+echo "Command: Image: /usr/local/images/chrome.png" >> /var/tmp/depnotify.log
+echo "Status: Installing Google Chrome" >> /var/tmp/depnotify.log </p>
+
+<p>${jamfbinary} policy -event "google_chrome"</p>
+
+<p>sleep 3
+echo "Command: Image: /usr/local/images/slack.png" >> /var/tmp/depnotify.log
+echo "Status: Installing Slack" >> /var/tmp/depnotify.log </p>
+
+<p>${jamfbinary} policy -event "slack"</p>
+
+<p>sleep 3
+echo "Command: Image: /usr/local/images/CCloud.png" >> /var/tmp/depnotify.log
+echo "Status: Installing Creative Cloud Launcher" >> /var/tmp/depnotify.log</p>
+
+<p>${jamfbinary} policy -event "creativecloud"</p>
+
+<p>sleep 3
+echo "Command: Image: /usr/local/images/VLC.png" >> /var/tmp/depnotify.log
+echo "Status: Installing VLC Media Player" >> /var/tmp/depnotify.log</p>
+
+<p>${jamfbinary} policy -event "vlcplayer"</p>
+
+<p>sleep 3
+echo "Command: Image: /usr/local/images/printers.png" >> /var/tmp/depnotify.log
+echo "Status: Installing Printer Software" >> /var/tmp/depnotify.log</p>
+
+<p>${jamfbinary} policy -event "printers"</p>
+
+<p>sleep 3
+echo "Command: Image: /usr/local/images/security.png" >> /var/tmp/depnotify.log
+echo "Status: Configuring Security Settings for your Computer" >> /var/tmp/depnotify.log</p>
+
+<p>${jamfbinary} policy -event "security"</p>
+
+<h1>sleep 3</h1>
+
+<h1>echo "Command: Image: /usr/local/images/Filevault.png" >> /var/tmp/depnotify.log</h1>
+
+<h1>echo "Status: Enabling FileVault Encryption" >> /var/tmp/depnotify.log</h1>
+
+<p>#</p>
+
+<h1>${jamfbinary} policy -event "filevault"</h1>
+
+<h2>#</h2>
+
+<h3>Welcome Screen</h3>
+
+<h2>#</h2>
+
+<p>sleep 5
+echo "Command: Image: /usr/local/images/logo.png" >> /var/tmp/depnotify.log
+echo "Status: Almost done!" >> /var/tmp/depnotify.log </p>
+
+<h2>#</h2>
+
+<h3>Clean Up</h3>
+
+<h2>#</h2>
+
+<h3>Reset AuthChanger</h3>
+
+<h1>/usr/local/bin/authchanger -reset -Okta —DefaultJCRight</h1>
+
+<p>sleep 3
+echo "Command: Quit" >> /var/tmp/depnotify.log</p>
+
+<p>sleep 1
+rm -rf /var/tmp/depnotify.log</p>
+
+<p>```</p>
+
+<p>This script displays different images, display text and runs the on-boarding JAMF Policies.  A better explaination of commands that can be run can be found here on JAMF's documentation page. <img src="https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Notify_Screen.html" alt="Notify Screen Mechanism" title="" /></p>
+
+<h2>Prestage Settings</h2>
+
+<p>When creating a Prestage Enrollment to work with there are a few settings and configuration profiles that need to be enabled so that Jamf Connect Login gets configured properly.</p>
+
+<ol>
+<li>Configuration Profiles (PPPC for Filevault and Jamf Connect Login Settings) should be scoped to these new computers in the <code>Configuration Profiles</code> section of JAMF Pro as well as scoped to the Prestage Enrollment. [Configuration Profiles in Prestage Enrollment] (https://github.com/zacharysfisher/connect-login-notify/blob/master/images/Config<em>Prestage</em>profiles.png)</li>
+<li>Attach your Prestage package to the prestage enrollment.</li>
+<li>Make sure that no account settings are enabled so that no accounts are created once computer gets enrolled.</li>
+<li>The last step is to setup the General Settings tab with information specific to your deployment and select which Setup Assistant options you want to display to the user.</li>
+</ol>
+
+<p>Once done, scope this enrollment to your devices.</p>
+
+<h2>Okta Configuration</h2>
+
+<p>If you are using the Plist linked above, no </p>
 
 <h2>Authorization Rules</h2>
 
