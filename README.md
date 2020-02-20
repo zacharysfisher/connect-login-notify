@@ -208,13 +208,13 @@ rm -rf /var/tmp/depnotify.log
 
 ```
 
-This script displays different images, display text and runs the on-boarding JAMF Policies.  A better explaination of commands that can be run can be found here on JAMF's documentation page. ![Notify Screen Mechanism](https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Notify_Screen.html)
+This script displays different images, display text and runs the on-boarding JAMF Policies.  A better explaination of commands that can be run can be found here on JAMF's documentation page. [Notify Screen Mechanism](https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Notify_Screen.html)
 
 
 ## Prestage Settings
 When creating a Prestage Enrollment to work with there are a few settings and configuration profiles that need to be enabled so that Jamf Connect Login gets configured properly.
 
-1. Configuration Profiles (PPPC for Filevault and Jamf Connect Login Settings) should be scoped to these new computers in the `Configuration Profiles` section of JAMF Pro as well as scoped to the Prestage Enrollment. [Configuration Profiles in Prestage Enrollment] (https://github.com/zacharysfisher/connect-login-notify/blob/master/images/Config_Prestage_profiles.png)
+1. Configuration Profiles (PPPC for Filevault and Jamf Connect Login Settings) should be scoped to these new computers in the `Configuration Profiles` section of JAMF Pro as well as scoped to the Prestage Enrollment. [Configuration Profiles in Prestage Enrollment](https://github.com/zacharysfisher/connect-login-notify/blob/master/images/Config_Prestage_profiles.png)
 2. Attach your Prestage package to the prestage enrollment.
 3. Make sure that no account settings are enabled so that no accounts are created once computer gets enrolled.
 4. The last step is to setup the General Settings tab with information specific to your deployment and select which Setup Assistant options you want to display to the user.
@@ -222,8 +222,12 @@ When creating a Prestage Enrollment to work with there are a few settings and co
 Once done, scope this enrollment to your devices.
 
 ## Okta Configuration
-If you are using the Plist linked above, no 
+If you are using the Plist linked above, no additionaly configuration is needed to allow users to log into computers using their Okta accounts.  However if you wish to segregate users and allow certain users to become Admins and others Standard, you will need to add some keys to your Plist and take some additional configuration steps in Okta.  Below are the keys that need to be added to your plist:
 
+| Key                    | Description                                                            | Example         |
+|------------------------|------------------------------------------------------------------------|-----------------|
+| OOIDCAdminClientID  | OIDC ClientID for Okta Application that makes the user an admin user upon logging in. | `<key>OIDCAdminClientID</key>` `<string>0oa3qmcgyywWj1JR52p7</string>` |
+| OIDCAccessClientID  | OIDC ClientID for Okta Application that makes the user a standard user upon logging in.    | `<key>OIDCAccessClientID</key>` `<string>0oa3qmdmdqJGOB1iG2p7</string>` |
 
 ## Authorization Rules ##
 | Rule Domain | Description |                                 
