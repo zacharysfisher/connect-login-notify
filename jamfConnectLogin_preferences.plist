@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AuthServer</key>
+	<string>acme.okta.com</string>
+	<key>HelpURL</key>
+	<string>https://acme.okta.com</string>
+	<key>LocalFallback</key>
+	<true/>
+	<key>LoginLogo</key>
+	<string>/usr/local/images/company_logo.png</string>
+	<key>OIDCIgnoreCookies</key>
+	<true/>
+	<key>OIDCRedirectURI</key>
+	<string>https://127.0.0.1/jamfconnect</string>
+	<key>AllowNetworkSelection</key>
+	<true/>
+	<key>CreateSyncPasswords</key>
+	<true/>
+	<key>ScriptPath</key>
+	<string>/usr/local/bin/enrollment_script.sh</string>
+	<key>EnableFDE</key>
+	<true/>
+</dict>
+</plist>
