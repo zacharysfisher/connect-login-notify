@@ -17,7 +17,7 @@ This page will explain how to configure Jamf Connect Login's Notify and Run Scri
 
 ## Prestage Package Configuration
 
-<a href="Prestage Package Configuration"><img src="https://github.com/zacharysfisher/connect-login-notify/blob/master/images/package_prestage.png" align="right" height="350" width="500" ></a>
+<a href="Prestage Package Configuration"><img src="https://github.com/zacharysfisher/connect-login-notify/blob/master/images/package_prestage.png" align="right" height="350" width="450" ></a>
 First we need to build our Pre-Stage package to look like the image to the right:
 <br>
 <br> 
