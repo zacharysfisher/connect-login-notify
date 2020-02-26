@@ -94,7 +94,7 @@ Below is an explanation of keys being used
 | EnableFDE     | Enables Filevault and stores the FV Recovery key locally for Escrow to JAMF Pro (Requires Escrow Configuration Profile to send to JAMF Pro). | `<key>CEnableFDE</key>` `<true/>` |
 
 **Please note**
-For 10.15 and on, a PCCC Configuration profile is needed.  [PCCC Payload to allow EnableFDE](https://github.com/zacharysfisher/connect-login-notify/blob/master/images/PCCC_FDE.png)
+For 10.15 and on, a PCCC Configuration profile is needed.  ![PCCC Payload to allow EnableFDE](https://github.com/zacharysfisher/connect-login-notify/blob/master/images/PCCC_FDE.png)
 
 ## RunScript Configuration
 JAMF has good instrutions on how to enable the RunScript mechanism for JAMF Login.  [RunScript Mechanism Documentation](https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Login_Script.html)
