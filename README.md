@@ -216,7 +216,7 @@ When creating a Prestage Enrollment to work with there are a few settings and co
 
 1. Configuration Profiles (PPPC for Filevault and Jamf Connect Login Settings) should be scoped to these new computers in the `Configuration Profiles` section of JAMF Pro as well as scoped to the Prestage Enrollment. [Configuration Profiles in Prestage Enrollment](https://github.com/zacharysfisher/connect-login-notify/blob/master/images/Config_Prestage_profiles.png)
 2. Attach your Prestage package to the prestage enrollment.
-3. Make sure that no account settings are enabled so that no accounts are created once computer gets enrolled.
+3. For Account Settings, in Prestage Enrollment.  Make you select to create an Admin Account.  Here you can hoose tho keep the account hidden as well as skipping user creaiton, which is something we want Jamf Connect Login to handle.  [Account Settings](https://github.com/zacharysfisher/connect-login-notify/blob/master/images/prestage_account_settings.png)
 4. The last step is to setup the General Settings tab with information specific to your deployment and select which Setup Assistant options you want to display to the user.
 
 Once done, scope this enrollment to your devices.
