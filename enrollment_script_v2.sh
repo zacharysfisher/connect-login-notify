@@ -12,12 +12,12 @@ echo "Enrollment beginning" >> /var/log/jamf.log
 echo "Starting Notify Run" >> $NOTIFY_LOG
 
 # Sidewalk Welcome
-echo "Command: Image: /usr/local/images/swl_logo.png.png" >> $NOTIFY_LOG
+echo "Command: Image: /usr/local/images/swl_logo.png" >> $NOTIFY_LOG
 echo "Command: MainTitle: Welcome to Sidewalk Labs!" >> $NOTIFY_LOG
-echo "Command: MainText: Your Mac is now managed and will be automatically configured for you." >> $NOTIFY_LOG
+echo "Command: MainText: Please be patient while we setup your computer and enroll it with Sidewalk Labs." >> $NOTIFY_LOG
 # Define the number of increments for the progress bar
 echo "Command: Determinate: 11" >> $NOTIFY_LOG
-echo "Status: Preparing your new Mac..." >> $NOTIFY_LOG
+echo "Status: Configuring your new Mac..." >> $NOTIFY_LOG
 sleep 15
 
 #adding a safety net here to make sure the Jamf Binary is present. Just in case there is some delay on the installation via MDM
@@ -48,7 +48,7 @@ sleep 10
 echo "Command: Image: /System/Library/CoreServices/Install in Progress.app/Contents/Resources/Installer.icns" >> $NOTIFY_LOG
 echo "Command: MainTitle: Installing everything you need for your first day" >> $NOTIFY_LOG
 echo "Command: MainText: All the apps you'll need today are already being installed. Once we're ready to start, you'll find Google Chrome, Slack, VLC Player and Creative Cloud are all ready to go. Launch apps from the dock and have fun!" >> $NOTIFY_LOG
-sleep 5
+sleep 10
 echo "Command: Image: /usr/local/images/chrome.png" >> $NOTIFY_LOG
 echo "Status: Installing Google Chrome" >> $NOTIFY_LOG 
 
@@ -86,9 +86,9 @@ ${jamfbinary} policy -event "security"
 
 sleep 3
 echo "Command: Image: /usr/local/images/appleLogo.png" >> $NOTIFY_LOG
-echo "Status: Installing latest Software Updates form Apple." >> >> $NOTIFY_LOG
+echo "Status: Installing latest Software Updates form Apple." >> $NOTIFY_LOG
 
-softwareupdate -ia
+/usr/sbin/softwareupdate -ia
 
 echo "Command: Image: /usr/local/images/swl_logo.png" >> $NOTIFY_LOG
 echo "Command: MainText: If you require any assistance with your new computer, please do not hesitate to contact support at support@sidewalklabs.com" >> $NOTIFY_LOG
