@@ -22,5 +22,7 @@
 	<string>/usr/local/bin/enrollment_script.sh</string>
 	<key>EnableFDE</key>
 	<true/>
+	<key>CreateAdminUser</key>
+	<false/>
 </dict>
 </plist>
