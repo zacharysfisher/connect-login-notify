@@ -37,7 +37,7 @@ installer -pkg /tmp/Jamf\ Connect\ Login-1.9.0.pkg -target /
 installer -pkg /tmp/Jamf\ Connect\ Sync-1.1.0.pkg -target /
 
 # Enable Notify - Run Script
-/usr/local/bin/authchanger -reset -Okta —DefaultJCRight -preAuth JamfConnectLogin:RunScript,privileged JamfConnectLogin:Notify
+/usr/local/bin/authchanger -reset -Okta -postAuth JamfConnectLogin:Notify JamfConnectLogin:RunScript,privileged
 
 
 exit 0		## Success
