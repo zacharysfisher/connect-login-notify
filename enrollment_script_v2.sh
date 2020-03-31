@@ -11,10 +11,10 @@ jamfbinary="/usr/local/bin/jamf"
 echo "Enrollment beginning" >> /var/log/jamf.log
 echo "Starting Notify Run" >> $NOTIFY_LOG
 
-# Sidewalk Welcome
-echo "Command: Image: /usr/local/images/swl_logo.png" >> $NOTIFY_LOG
-echo "Command: MainTitle: Welcome to Sidewalk Labs!" >> $NOTIFY_LOG
-echo "Command: MainText: Please be patient while we setup your computer and enroll it with Sidewalk Labs." >> $NOTIFY_LOG
+# COMPANY Welcome
+echo "Command: Image: /usr/local/images/COMPANY_logo.png" >> $NOTIFY_LOG
+echo "Command: MainTitle: Welcome to COMPANY!" >> $NOTIFY_LOG
+echo "Command: MainText: Please be patient while we setup your computer and enroll it with COMPANY." >> $NOTIFY_LOG
 # Define the number of increments for the progress bar
 echo "Command: Determinate: 11" >> $NOTIFY_LOG
 echo "Status: Configuring your new Mac..." >> $NOTIFY_LOG
@@ -90,8 +90,8 @@ echo "Status: Installing latest Software Updates form Apple." >> $NOTIFY_LOG
 
 /usr/sbin/softwareupdate -ia
 
-echo "Command: Image: /usr/local/images/swl_logo.png" >> $NOTIFY_LOG
-echo "Command: MainText: If you require any assistance with your new computer, please do not hesitate to contact support at support@sidewalklabs.com" >> $NOTIFY_LOG
+echo "Command: Image: /usr/local/images/COMPANY_logo.png" >> $NOTIFY_LOG
+echo "Command: MainText: If you require any assistance with your new computer, please do not hesitate to contact support at support@COMPANYlabs.com" >> $NOTIFY_LOG
 echo "Status: Almost done!" >> $NOTIFY_LOG 
 sleep 15
 

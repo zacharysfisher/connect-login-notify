@@ -12,11 +12,11 @@ echo "Enrollment Beginning..." >> /var/log/jamf.log
 # Set a main image
 # Image can be up to 660x105 it will scale up or down proportionally to fit
 
-echo "Command: Image: /usr/local/images/swl_logo.png.png" >> /var/tmp/depnotify.log
+echo "Command: Image: /usr/local/images/COMPANY_logo.png.png" >> /var/tmp/depnotify.log
 
 # Set the Main Title at the top of the window
 
-echo "Command: MainTitle: Welcome to Sidewalk Labs!" >> /var/tmp/depnotify.log
+echo "Command: MainTitle: Welcome to COMPANY!" >> /var/tmp/depnotify.log
 
 # Set the Body Text
 
@@ -26,7 +26,7 @@ echo "Status: Preparing new machine" >> /var/tmp/depnotify.log
 Sleep 5
 echo "Command: Determinate: 9" >> /var/tmp/depnotify.log
 sleep 5
-echo "Status: Enrolling machine with Sidewalk Labs" >> /var/tmp/depnotify.log 
+echo "Status: Enrolling machine with COMPANY" >> /var/tmp/depnotify.log 
 Sleep 5
 #adding a safety net here to make sure the Jamf Binary is present. Just in case there is some delay on the installation via MDM
 
@@ -89,10 +89,10 @@ softwareupdate -ia
 #${jamfbinary} policy -event "filevault"
 
 ###
-### Welcome Sidewalk Labs Screen
+### Welcome COMPANY Screen
 ###
 
-echo "Command: Image: /usr/local/images/swl_logo.png" >> /var/tmp/depnotify.log
+echo "Command: Image: /usr/local/images/COMPANY_logo.png" >> /var/tmp/depnotify.log
 echo "Command: MainText: If you require any assistance with your new computer, please do not hesitate to contact support at support@sidewalklabs.com"
 echo "Status: Almost done!" >> /var/tmp/depnotify.log 
 

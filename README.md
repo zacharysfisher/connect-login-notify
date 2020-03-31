@@ -101,7 +101,7 @@ JAMF has good instrutions on how to enable the RunScript mechanism for JAMF Logi
 
 You can also follow these instructions using the nano editor.
 1. We have actually already enabled our workflow to enable this mechanism by using the `authchanger` command and to include `JamfConnectLogin:RunScript,privileged` in our postInstall script.
-2. In this script we will tell Notify what to display and what JAMF Policies to run.  See the script in this repo for an example script that is modelled after information that JAMF provides.
+2. In this script we will tell Notify what to display and what JAMF Policies to run.  See the script in this repo for an example script that is modelled after information that JAMF provides.  I have also attached a script that renames computers based on a users first name and last name from their Okta Profile.
 
 
 
