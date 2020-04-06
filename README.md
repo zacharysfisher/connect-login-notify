@@ -44,7 +44,7 @@ exit 0		## Success
 exit 1		## Failure
 ```
 
-Once this package is ready for building, make sure that you sign the package and upload it to your distribution points for deployment.
+Once this package is ready for building, make sure that you `sign` the package and upload it to your distribution points for deployment.
 
 ## Plist Configuration for Jamf Connect Login
 Below is an example Plist that we can use with a Custom Settings payload Configuration Profile:
@@ -118,10 +118,19 @@ When creating a Prestage Enrollment to work with there are a few settings and co
 
 Once done, scope this enrollment to your devices.
 
-## Okta Configuration
+## Okta Configurations for Standard / Admin Users
 If you are using the Plist linked above, no additionaly configuration is needed to allow users to log into computers using their Okta accounts.  However if you wish to segregate users and allow certain users to become Admins and others Standard, you will need to add some keys to your Plist and take some additional configuration steps in Okta.  Below are the keys that need to be added to your plist:
 
 | Key                    | Description                                                            | Example         |
 |------------------------|------------------------------------------------------------------------|-----------------|
 | OIDCAdminClientID  | OIDC ClientID for Okta Application that makes the user an admin user upon logging in. | `<key>OIDCAdminClientID</key>` `<string>0oa3qmcgyywWj1JR52p7</string>` |
 | OIDCAccessClientID  | OIDC ClientID for Okta Application that makes the user a standard user upon logging in.    | `<key>OIDCAccessClientID</key>` `<string>0oa3qmdmdqJGOB1iG2p7</string>` |
+
+
+## Deployment
+
+1) Upload your prestage package to your specified Distribution point.  As of a recent relase of JAMF Pro this no longer needs to be a Cloud Distribution point but it does require HTTPS.  In addition to this, make sure that your PKG is signed.
+2) Double check that your configuration profiles are scopes to proper machines in the Configuration Profiles section of JAMF Pro and the same configuration profiles are selected for prestage enrollment deployment.  
+3) If you are going to use the rename script that is in this Repo, make sure it is being called during notify.  The script itself uses ![Encrypted Script Parameters](https://github.com/jamf/Encrypted-Script-Parameters) to encrypt the Okta API Key.
+4) Double check your Prestage settings to make sure that account creation is skipped and that the Prestage is assigned to the proper devices.
+5)
