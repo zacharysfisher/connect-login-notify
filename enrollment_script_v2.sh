@@ -95,3 +95,6 @@ echo "Command: Quit" >> $NOTIFY_LOG
 
 sleep 1
 rm -rf $NOTIFY_LOG
+
+# Resets Authchanger
+/usr/local/bin/authchanger -reset -Okta
