@@ -131,6 +131,5 @@ If you are using the Plist linked above, no additionaly configuration is needed 
 
 1) Upload your prestage package to your specified Distribution point.  As of a recent relase of JAMF Pro this no longer needs to be a Cloud Distribution point but it does require HTTPS.  In addition to this, make sure that your PKG is signed.
 2) Double check that your configuration profiles are scopes to proper machines in the Configuration Profiles section of JAMF Pro and the same configuration profiles are selected for prestage enrollment deployment.  
-3) If you are going to use the rename script that is in this Repo, make sure it is being called during notify.  The script itself uses [Encrypted Script Parameters](https://github.com/jamf/Encrypted-Script-Parameters) to encrypt the Okta API Key.
+3) If you are going to use the rename script that is in this Repo, make sure it is being called during notify.  Make sure that the Okta API key it uses is a Read Only key.
 4) Double check your Prestage settings to make sure that account creation is skipped and that the Prestage is assigned to the proper devices.
-5) 
