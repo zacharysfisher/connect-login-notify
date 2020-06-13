@@ -97,7 +97,7 @@ Below is an explanation of keys being used
 For 10.15 and on, a PCCC Configuration profile is needed.  ![PCCC Payload to allow EnableFDE](https://github.com/zacharysfisher/connect-login-notify/blob/master/images/PCCC_FDE.png)
 
 ## RunScript Configuration
-JAMF has good instrutions on how to enable the RunScript mechanism for JAMF Login.  [RunScript Mechanism Documentation](https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Login_Script.html)
+JAMF has good instrutions on how to enable the RunScript mechanism for JAMF Login.  [RunScript Mechanism Documentation](https://www.jamf.com/resources/product-documentation/jamf-connect-administrators-guide/)
 
 You can also follow these instructions using the nano editor.
 1. We have actually already enabled our workflow to enable this mechanism by using the `authchanger` command and to include `JamfConnectLogin:RunScript,privileged` in our postInstall script.
@@ -105,7 +105,7 @@ You can also follow these instructions using the nano editor.
 
 
 
-This script displays different images, display text and runs the on-boarding JAMF Policies.  A better explaination of commands that can be run can be found here on JAMF's documentation page. [Notify Screen Mechanism](https://docs.jamf.com/jamf-connect/1.17.0/administrator-guide/Notify_Screen.html)
+This script displays different images, display text and runs the on-boarding JAMF Policies.  A better explaination of commands that can be run can be found here on JAMF's documentation page. [Notify Screen Mechanism](https://www.jamf.com/resources/product-documentation/jamf-connect-administrators-guide/)
 
 
 ## Prestage Settings
